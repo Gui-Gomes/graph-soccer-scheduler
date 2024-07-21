@@ -77,7 +77,7 @@ class Championship:
 
         # Draw the graph
         plt.figure(figsize=(10, 8))
-        pos = nx.spring_layout(self.restrictions)
+        pos = nx.spring_layout(self.restrictions, k=1)
         nx.draw(
             self.restrictions,
             pos,
