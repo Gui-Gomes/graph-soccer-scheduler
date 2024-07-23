@@ -74,7 +74,9 @@ def main_menu(cp):
         if choice == 1:
             print()
             print_all_rounds(cp)
-            input("Press any key to return to the menu...")  # Pause and wait for user input
+            input(
+                "Press any key to return to the menu..."
+            )  # Pause and wait for user input
         elif choice == 2:
             print_program_information()
         elif choice == 3:
