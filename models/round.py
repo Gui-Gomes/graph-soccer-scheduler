@@ -1,5 +1,6 @@
 import networkx as nx
 import matplotlib.pyplot as plt
+from matplotlib.patches import Patch
 
 
 class Round:
@@ -85,8 +86,10 @@ class Round:
         filename = f"Round_{self.__id}.png"
         filepath = f"{directory}/{filename}"
 
-        # Draw the graph
-        plt.figure(figsize=(10, 5))
+        # Draw the graph with a resolution of 1920x1080
+        plt.figure(figsize=(19.2, 10.8))
+        ax = plt.gca()
+        ax.margins(0.1)  # Add margins around the graph
         nx.draw(
             self.matches,
             pos,
@@ -95,7 +98,16 @@ class Round:
                 "skyblue" if node in home_teams else "lightgreen"
                 for node in self.matches
             ],
+            ax=ax,
         )
+
+        # Add legend
+        legend_elements = [
+            Patch(facecolor="skyblue", edgecolor="k", label="Home Teams"),
+            Patch(facecolor="lightgreen", edgecolor="k", label="Away Teams"),
+        ]
+        plt.legend(handles=legend_elements, loc="upper right")
+
         plt.title(f"Round {self.__id}")
         plt.savefig(filepath)
         plt.close()
