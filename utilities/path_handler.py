@@ -28,10 +28,31 @@ def get_images_directory():
     return ensure_directory_exists(images_dir)
 
 
-# Get the path to the rounds images directory, creating it if necessary
-def get_round_images_directory():
+# Get the path to the rounds images directory for the championship without restrictions, creating it if necessary
+def get_round_images_directory_for_championship_without_restrictions():
     current_dir = os.path.abspath(os.path.dirname(__file__))
-    rounds_images_dir = os.path.join(current_dir, "..", "database", "images", "rounds")
+    rounds_images_dir = os.path.join(
+        current_dir,
+        "..",
+        "database",
+        "images",
+        "championship_without_restrictions",
+        "rounds",
+    )
+    return ensure_directory_exists(rounds_images_dir)
+
+
+# Get the path to the rounds images directory for the championship with restrictions, creating it if necessary
+def get_round_images_directory_for_championship_with_restrictions():
+    current_dir = os.path.abspath(os.path.dirname(__file__))
+    rounds_images_dir = os.path.join(
+        current_dir,
+        "..",
+        "database",
+        "images",
+        "championship_with_restrictions",
+        "rounds",
+    )
     return ensure_directory_exists(rounds_images_dir)
 
 
