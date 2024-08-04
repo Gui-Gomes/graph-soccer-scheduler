@@ -43,6 +43,14 @@ class Round:
             and self.matches.nodes[acronym].get("bipartite") == 1
         )
 
+    # Method for check if a team is participating in the round
+    def is_team_in_round(self, acronym):
+        return self.is_home_team(acronym) or self.is_away_team(acronym)
+
+    # Method for check if the round is valid
+    def is_valid_round(self, number_of_teams):
+        return len(self.matches.edges()) == (number_of_teams // 2)
+
     # Method to add a team as a home team
     def add_home_team(self, acronym):
         if self.is_home_team(acronym) or self.is_away_team(acronym):
@@ -67,6 +75,10 @@ class Round:
             )
 
         self.matches.add_edge(home_team_acronym, away_team_acronym)
+
+    # Method to clear all matches from the round
+    def reset_matches(self):
+        self.__matches.clear()
 
     # Method to generate and save a bipartite graph image
     def generate_bipartite_graph_image(self, directory):

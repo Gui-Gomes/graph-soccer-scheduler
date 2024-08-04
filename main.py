@@ -9,7 +9,7 @@ from models.championship import Championship
 
 # Set up Championship with teams, restrictions, and images
 def setup_championship():
-    teams = read_csv(get_csv_directory() + "/teste.csv")
+    teams = read_csv(get_csv_directory() + "/teams.csv")
     cp = Championship("Campeonato Brasileiro 2024")
 
     for team in teams:
@@ -17,7 +17,7 @@ def setup_championship():
 
     cp.create_restrictions()
     cp.generate_graph_coloring_image(get_images_directory())
-    cp.generate_schedule(directory=get_round_images_directory())
+    cp.generate_round_robin_schedule(directory=get_round_images_directory())
 
     print("Championship set up and pairings generated.")
     input("Press any key to continue...")  # Pause and wait for user input
@@ -74,9 +74,7 @@ def main_menu(cp):
         if choice == 1:
             print()
             print_all_rounds(cp)
-            input(
-                "Press any key to return to the menu..."
-            )  # Pause and wait for user input
+            input("Press any key to return to the menu...")  # Pause and wait for user input
         elif choice == 2:
             print_program_information()
         elif choice == 3:

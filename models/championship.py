@@ -1,4 +1,5 @@
 import random
+import itertools
 import networkx as nx
 import matplotlib.pyplot as plt
 from matplotlib.patches import Patch
@@ -67,10 +68,17 @@ class Championship:
     def __number_of_teams(self):
         return len(self.teams)
 
+    # Private method to get the number of rounds
+    def __number_of_rounds(self):
+        return (self.__number_of_teams() - 1) * 2
+
+    # Private method to get the number of colors of the colored graph
+    def __get_largest_number_of_teams_in_same_city(self):
+        return max(dict(self.restrictions.degree()).values()) + 1
+
     # Private method to initialize the rounds
     def __initialize_rounds(self):
-        number_of_rounds = (self.__number_of_teams() - 1) * 2
-        for i in range(1, number_of_rounds + 1):
+        for i in range(1, self.__number_of_rounds() + 1):
             self.rounds[i] = Round(i)
 
     # Method to create restrictions based on teams from the same city
@@ -88,6 +96,97 @@ class Championship:
     # Private method to check if there is a restriction between two teams
     def __check_team_restriction(self, home_team_acronym, away_team_acronym):
         return self.restrictions.has_edge(home_team_acronym, away_team_acronym)
+
+    # Private method for check if a valid schedule can be created with city constraints
+    def __can_generate_schedule_with_restrictions(self):
+        return (
+            self.__get_largest_number_of_teams_in_same_city()
+            * (self.__number_of_rounds() // 2)
+            <= self.__number_of_rounds()
+        )
+
+    # Method to create a championship game schedule.
+    def generate_round_robin_schedule(self, directory="."):
+        number_of_teams = self.__number_of_teams()
+        if number_of_teams % 2 != 0:
+            raise ValueError("Number of teams must be even.")
+
+        if not self.__can_generate_schedule_with_restrictions():
+            print(
+                "It's not possible to generate a schedule with the given restrictions."
+            )
+            return
+
+        self.__initialize_rounds()
+        teams = list(self.teams.keys())
+        half_rounds = self.__number_of_rounds() // 2
+
+        # Generate the first half of the schedule
+        for round_index in range(half_rounds):
+            round_instance = self.rounds[round_index + 1]
+            random.shuffle(teams)
+
+            home_teams = set()
+            away_teams = set()
+
+            for i in range(0, number_of_teams // 2):
+                home_team = teams[i]
+                away_team = teams[number_of_teams - i - 1]
+
+                # Check city restrictions
+                if any(
+                    self.__check_team_restriction(home_team, ht) for ht in home_teams
+                ):
+                    home_team, away_team = away_team, home_team
+
+                round_instance.add_home_team(home_team)
+                round_instance.add_away_team(away_team)
+                round_instance.create_match_pair(home_team, away_team)
+
+                home_teams.add(home_team)
+                away_teams.add(away_team)
+
+            # Verify and handle restrictions for teams from the same city
+            for team in home_teams:
+                city_teams = [
+                    t for t in self.teams if self.__check_team_restriction(team, t)
+                ]
+                for ct in city_teams:
+                    if ct in home_teams:
+                        raise ValueError(
+                            f"City restriction violated: {team} and {ct} are both home teams in the same round."
+                        )
+
+            round_instance.generate_bipartite_graph_image(directory)
+
+        # Generate the second half of the schedule as the inverse of the first half
+        for round_index in range(half_rounds):
+            round_instance = self.rounds[half_rounds + round_index + 1]
+            first_half_round = self.rounds[round_index + 1]
+
+            home_teams = set()
+            away_teams = set()
+
+            for home_team, away_team in first_half_round.matches.edges():
+                round_instance.add_home_team(away_team)
+                round_instance.add_away_team(home_team)
+                round_instance.create_match_pair(away_team, home_team)
+
+                home_teams.add(away_team)
+                away_teams.add(home_team)
+
+            # Verify and handle restrictions for teams from the same city
+            for team in home_teams:
+                city_teams = [
+                    t for t in self.teams if self.__check_team_restriction(team, t)
+                ]
+                for ct in city_teams:
+                    if ct in home_teams:
+                        raise ValueError(
+                            f"City restriction violated: {team} and {ct} are both home teams in the same round."
+                        )
+
+            round_instance.generate_bipartite_graph_image(directory)
 
     # Method to generate a graph coloring image of the restrictions
     def generate_graph_coloring_image(
@@ -143,14 +242,16 @@ class Championship:
         # Print each round and the teams that will face each other
         for round_num, round_instance in sorted_rounds:
             print(f"Round {round_num}:")
-            matches = round_instance.matches.edges()
+            matches = list(
+                round_instance.matches.edges()
+            )  # Convert to list to index matches
             if not matches:
                 print("No matches")
                 continue
 
-            for home_team, away_team in matches:
+            for match_num, (home_team, away_team) in enumerate(matches, start=1):
                 home_team_name = self.teams[home_team].name
                 away_team_name = self.teams[away_team].name
-                print(f"{home_team_name} vs {away_team_name}")
+                print(f"Match {match_num}: {home_team_name} vs {away_team_name}")
 
             print()
