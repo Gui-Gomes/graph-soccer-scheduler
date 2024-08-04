@@ -2,6 +2,8 @@
 
 ## Sobre
 
+Projeto 03 de Teoria e Aplicação de Grafos desenvolvido por Guilherme Gomes Santa Rosa (241017684).
+
 Este projeto implementa um sistema de gerenciamento de campeonatos de futebol, gerando um campeonato com 38 rodadas, incluindo jogos de ida e volta. Desenvolvido em Python, o projeto é parte do trabalho da disciplina Teoria e Aplicação de Grafos da Universidade de Brasília (UnB), utilizando as bibliotecas NetworkX para manipulação de grafos e Matplotlib para visualização.
 
 O sistema permite a definição de times e a geração de uma tabela de partidas com a restrição de que times da mesma cidade não podem ser mandantes simultaneamente. Os dados podem ser importados de arquivos CSV formatados especificamente.
