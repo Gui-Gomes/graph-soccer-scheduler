@@ -1,9 +1,8 @@
 from utilities.csv_handler import read_csv
 from utilities.path_handler import (
     get_csv_directory,
+    get_round_images_directory,
     get_images_directory,
-    get_round_images_directory_for_championship_with_restrictions,
-    get_round_images_directory_for_championship_without_restrictions
 )
 from models.championship import Championship
 
@@ -18,7 +17,7 @@ def setup_championship():
 
     cp.create_restrictions()
     cp.generate_graph_coloring_image(get_images_directory())
-    cp.generate_round_robin_schedule(directory=get_round_images_directory_for_championship_with_restrictions())
+    cp.generate_round_robin_schedule(directory=get_round_images_directory())
 
     print("Championship set up and pairings generated.")
     input("Press any key to continue...")  # Pause and wait for user input
@@ -75,9 +74,7 @@ def main_menu(cp):
         if choice == 1:
             print()
             print_all_rounds(cp)
-            input(
-                "Press any key to return to the menu..."
-            )  # Pause and wait for user input
+            input("Press any key to return to the menu...")  # Pause and wait for user input
         elif choice == 2:
             print_program_information()
         elif choice == 3:

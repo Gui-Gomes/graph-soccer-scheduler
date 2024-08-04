@@ -105,6 +105,7 @@ class Championship:
             <= self.__number_of_rounds()
         )
 
+    # Method to create a championship game schedule.
     def generate_round_robin_schedule(self, directory="."):
         number_of_teams = self.__number_of_teams()
         if number_of_teams % 2 != 0:
@@ -145,6 +146,17 @@ class Championship:
                 home_teams.add(home_team)
                 away_teams.add(away_team)
 
+            # Verify and handle restrictions for teams from the same city
+            for team in home_teams:
+                city_teams = [
+                    t for t in self.teams if self.__check_team_restriction(team, t)
+                ]
+                for ct in city_teams:
+                    if ct in home_teams:
+                        raise ValueError(
+                            f"City restriction violated: {team} and {ct} are both home teams in the same round."
+                        )
+
             round_instance.generate_bipartite_graph_image(directory)
 
         # Generate the second half of the schedule as the inverse of the first half
@@ -152,10 +164,27 @@ class Championship:
             round_instance = self.rounds[half_rounds + round_index + 1]
             first_half_round = self.rounds[round_index + 1]
 
+            home_teams = set()
+            away_teams = set()
+
             for home_team, away_team in first_half_round.matches.edges():
                 round_instance.add_home_team(away_team)
                 round_instance.add_away_team(home_team)
                 round_instance.create_match_pair(away_team, home_team)
+
+                home_teams.add(away_team)
+                away_teams.add(home_team)
+
+            # Verify and handle restrictions for teams from the same city
+            for team in home_teams:
+                city_teams = [
+                    t for t in self.teams if self.__check_team_restriction(team, t)
+                ]
+                for ct in city_teams:
+                    if ct in home_teams:
+                        raise ValueError(
+                            f"City restriction violated: {team} and {ct} are both home teams in the same round."
+                        )
 
             round_instance.generate_bipartite_graph_image(directory)
 
